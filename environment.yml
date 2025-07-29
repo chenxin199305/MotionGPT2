@@ -1,4 +1,4 @@
-name: motiongpt
+name: mgpt2
 channels:
   - menpo
   - conda-forge
