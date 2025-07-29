@@ -9,6 +9,7 @@ Please visit our [Project Page](https://qiqiapink.github.io/MotionGPT) for more 
 ![image](./static/images/motiongpt.png)
 
 If you find MotionGPT useful for your work please cite:
+
 ```
 @article{zhang2023motiongpt,
   title={MotionGPT: Finetuned LLMs are General-Purpose Motion Generators},
@@ -19,6 +20,7 @@ If you find MotionGPT useful for your work please cite:
 ```
 
 ## Table of Content
+
 * [Installation](#installation)
 * [Demo](#demo)
 * [Train](#train)
@@ -29,26 +31,37 @@ If you find MotionGPT useful for your work please cite:
 ## Installation
 
 ## 1. Environment
+
 ```
+# Not have mgpt2 conda environment:
 conda env create -f environment.yml
 conda activate mgpt2
+
+# Have mgpt2 conda environment:
+conda activate mgpt2
+pip install -r requirements.txt
 ```
 
 ## 2. Dependencies
+
 For text to motion evaluation
+
 ```
 bash prepare/download_evaluators.sh
 bash prepare/download_glove.sh
 ```
 
 For SMPL mesh rendering
+
 ```
 bash prepare/download_smpl.sh
 ```
 
-For using the LLaMa model weight, follow [pyllama](https://github.com/juncongmoo/pyllama) to download the original LLaMA model, and then follow [Lit-LLaMA](https://github.com/Lightning-AI/lit-llama) to convert the weights to the Lit-LLaMA format. After this process, please move the `lit-llama/` directory under the `checkpoints/` directory.
+For using the LLaMa model weight, follow [pyllama](https://github.com/juncongmoo/pyllama) to download the original LLaMA model, and then follow [Lit-LLaMA](https://github.com/Lightning-AI/lit-llama) to convert the weights to the Lit-LLaMA format.
+After this process, please move the `lit-llama/` directory under the `checkpoints/` directory.
 
 Once downloaded, you should have a folder like this:
+
 ```
 MotionGPT
 ├── checkpoints
@@ -82,17 +95,21 @@ MotionGPT
 ```
 
 ## 3. Pretrained Models
+
 For pretrained VQ-VAE models
+
 ```
 bash prepare/download_vqvae.sh
 ```
 
 For finetuned LLaMA model
+
 ```
 bash prepare/download_lora.sh
 ```
 
 Once downloaded, you should have a folder like this:
+
 ```
 MotionGPT/checkpoints
 ├── pretrained_vqvae
@@ -103,7 +120,9 @@ MotionGPT/checkpoints
 ```
 
 ## 4. Dataset
+
 Please follow [HumanML3D](https://github.com/EricGuo5513/HumanML3D) to download HumanML3D and KIT-ML datasets and put them under the directory `dataset` like:
+
 ```
 MotionGPT/dataset
 ├── HumanML3D
@@ -111,83 +130,129 @@ MotionGPT/dataset
 ```
 
 To prepare the dataset used for finetuning LLaMA, please follow the instructions below (take HumanML3D as an example)
+
 ```python
 # Encode the motions to tokens by pretrianed VQ-VAE and save the token sequence results under `./dataset/HumanML3D/VQVAE/`
 # For pretrained VQ-VAE, you can use the model provided or train the model by yourself following the training instruction.
-python scripts/prepare_data.py --dataname t2m
+python
+scripts / prepare_data.py - -dataname
+t2m
 
 # Generate the dataset on train split and validation split in the format of {instruction, input, output}
 # Results saved as `./data/train.json` and `./data/val.json`
-python scripts/generate_dataset.py --dataname t2m
+python
+scripts / generate_dataset.py - -dataname
+t2m
 
 # Generate corresponding instruction tuning dataset
 # Results saved as `./data/train.pt` and `./data/val.pt`
-python scripts/prepare_motion.py --dataname t2m
+python
+scripts / prepare_motion.py - -dataname
+t2m
 ```
 
 ## Demo
+
 Give task description (`--prompt`) and conditions (`--input`) to generate corresponding motion. The motion in `npy` format (`demo.npy`) and skeleton visualization result (`demo.gif`) will be saved under {output_dir}.
 
 Please set `--render` if you want to render SMPL mesh.
 
 ```python
 # text-to-motion
-python generate_motion.py --prompt "Generate a sequence of motion tokens matching the following human motion description." --input "a person walks forward." --lora_path ./checkpoints/pretrained_lora/pretrained.pth --out_dir {output_dir} --render
+python
+generate_motion.py - -prompt
+"Generate a sequence of motion tokens matching the following human motion description." - -input
+"a person walks forward." - -lora_path. / checkpoints / pretrained_lora / pretrained.pth - -out_dir
+{output_dir} - -render
 
 # (text, init pose)-to-motion
-python generate_motion.py --prompt "Generate a sequence of motion tokens matching the following human motion description given the initial token." --input "a person walks forward.<Motion Token>315</Motion Token>" --lora_path ./checkpoints/pretrained_lora/pretrained.pth --out_dir {output_dir} --render
+python
+generate_motion.py - -prompt
+"Generate a sequence of motion tokens matching the following human motion description given the initial token." - -input
+"a person walks forward.<Motion Token>315</Motion Token>" - -lora_path. / checkpoints / pretrained_lora / pretrained.pth - -out_dir
+{output_dir} - -render
 
 # (text, last pose)-to-motion
-python generate_motion.py --prompt "Generate a sequence of motion tokens matching the following human motion description given the last token." --input "a person walks forward.<Motion Token>406</Motion Token>" --lora_path ./checkpoints/pretrained_lora/pretrained.pth --out_dir {output_dir} --render
+python
+generate_motion.py - -prompt
+"Generate a sequence of motion tokens matching the following human motion description given the last token." - -input
+"a person walks forward.<Motion Token>406</Motion Token>" - -lora_path. / checkpoints / pretrained_lora / pretrained.pth - -out_dir
+{output_dir} - -render
 
 # (text, key poses)-to-motion
-python generate_motion.py --prompt "Generate a sequence of motion tokens matching the following human motion description given several key tokens." --input "a person walks forward.<Motion Token>315,91,406</Motion Token>" --lora_path ./checkpoints/pretrained_lora/pretrained.pth --out_dir {output_dir} --render
+python
+generate_motion.py - -prompt
+"Generate a sequence of motion tokens matching the following human motion description given several key tokens." - -input
+"a person walks forward.<Motion Token>315,91,406</Motion Token>" - -lora_path. / checkpoints / pretrained_lora / pretrained.pth - -out_dir
+{output_dir} - -render
 ```
 
 ## Train
+
 For VQ-VAE training
+
 ```
 python train_vqvae.py --out_dir {output_dir} --dataname t2m
 ```
 
 For finetuning LLaMA with LoRA
+
 ```
 python finetune_motion.py --out_dir {output_dir} --dataname t2m
 ```
 
 ## Evaluation
+
 For VQ-VAE
+
 ```
 python eval_vqvae.py --out_dir {output_dir} --resume_pth {vqvae_model_path} --dataname t2m
 ```
 
 For LLaMA
+
 ```
 python eval.py --vqvae_pth {vqvae_model_path} --lora_path {fintuned_model_path} --out_dir {output_dir} --dataname t2m
 ```
 
 ## Visualization
+
 The generated poses are all saved in `npy` format with the shape of `[seq_len, joint_num, 3]`
 
 The output results are saved under the same directory with the corresponding filename in `gif` format
 
 For visualization in skeleton format
+
 ```python
 # To visualize all the poses saved in {saved_pose_dir}
-python visualization/plot_3d_global.py --dir {saved_pose_dir}
+python
+visualization / plot_3d_global.py - -dir
+{saved_pose_dir}
 
 # To visualize selected poses in {saved_pose_dir}
-python visualization/plot_3d_global.py --dir {saved_pose_dir} --motion-list {fname1} {fname2} ...
+python
+visualization / plot_3d_global.py - -dir
+{saved_pose_dir} - -motion - list
+{fname1}
+{fname2}...
 ```
 
 For SMPL mesh rendering
+
 ```python
 # To visualize all the poses saved in {saved_pose_dir}
-python visualization/render.py --dir {saved_pose_dir}
+python
+visualization / render.py - -dir
+{saved_pose_dir}
 
 # To visualize selected poses in {saved_pose_dir}
-python visualization/render.py --dir {saved_pose_dir} --motion-list {fname1} {fname2} ...
+python
+visualization / render.py - -dir
+{saved_pose_dir} - -motion - list
+{fname1}
+{fname2}...
 ```
 
 ## Acknowledgement
+
 Thanks to [HumanML3D](https://github.com/EricGuo5513/HumanML3D), [T2M-GPT](https://github.com/Mael-zys/T2M-GPT) and [Lit-LLaMA](https://github.com/Lightning-AI/lit-llama), our code is partially borrowing from them.
