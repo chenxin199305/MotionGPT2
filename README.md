@@ -31,7 +31,7 @@ If you find MotionGPT useful for your work please cite:
 ## 1. Environment
 ```
 conda env create -f environment.yml
-conda activate motiongpt
+conda activate mgpt2
 ```
 
 ## 2. Dependencies
