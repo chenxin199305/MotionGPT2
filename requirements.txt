@@ -201,3 +201,7 @@ zipp==3.15.0
 zstandard==0.21.0
 
 gdown
+trimesh
+h5py
+pyrender
+shapely

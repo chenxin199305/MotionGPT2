@@ -1,2 +1,14 @@
 .idea/
 .vscode/
+
+checkpoints/
+dataset/
+
+body_models/
+models/
+pyllama_data/
+lit_llama/
+glove/
+visualize/
+
+__pycache__/

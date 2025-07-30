@@ -40,6 +40,13 @@ conda activate mgpt2
 # Have mgpt2 conda environment:
 conda activate mgpt2
 pip install -r requirements.txt
+
+# OpenGL
+sudo apt update && sudo apt install libosmesa6 libgl1-mesa-glx
+
+# GLIBCXX
+conda activate mgpt2
+conda install -c conda-forge libgcc libstdcxx-ng
 ```
 
 ## 2. Dependencies
@@ -131,24 +138,18 @@ MotionGPT/dataset
 
 To prepare the dataset used for finetuning LLaMA, please follow the instructions below (take HumanML3D as an example)
 
-```python
+```
 # Encode the motions to tokens by pretrianed VQ-VAE and save the token sequence results under `./dataset/HumanML3D/VQVAE/`
 # For pretrained VQ-VAE, you can use the model provided or train the model by yourself following the training instruction.
-python
-scripts / prepare_data.py - -dataname
-t2m
+python scripts/prepare_data.py --dataname t2m
 
 # Generate the dataset on train split and validation split in the format of {instruction, input, output}
 # Results saved as `./data/train.json` and `./data/val.json`
-python
-scripts / generate_dataset.py - -dataname
-t2m
+python scripts/generate_dataset.py --dataname t2m
 
 # Generate corresponding instruction tuning dataset
 # Results saved as `./data/train.pt` and `./data/val.pt`
-python
-scripts / prepare_motion.py - -dataname
-t2m
+python scripts/prepare_motion.py --dataname t2m
 ```
 
 ## Demo
@@ -157,33 +158,36 @@ Give task description (`--prompt`) and conditions (`--input`) to generate corres
 
 Please set `--render` if you want to render SMPL mesh.
 
-```python
+```
 # text-to-motion
-python
-generate_motion.py - -prompt
-"Generate a sequence of motion tokens matching the following human motion description." - -input
-"a person walks forward." - -lora_path. / checkpoints / pretrained_lora / pretrained.pth - -out_dir
-{output_dir} - -render
+python generate_motion.py 
+--prompt "Generate a sequence of motion tokens matching the following human motion description." 
+--input "a person walks forward." 
+--lora_path ./checkpoints/pretrained_lora/pretrained.pth 
+--out_dir {output_dir} 
+--render
 
 # (text, init pose)-to-motion
-python
-generate_motion.py - -prompt
-"Generate a sequence of motion tokens matching the following human motion description given the initial token." - -input
-"a person walks forward.<Motion Token>315</Motion Token>" - -lora_path. / checkpoints / pretrained_lora / pretrained.pth - -out_dir
-{output_dir} - -render
+python generate_motion.py 
+--prompt "Generate a sequence of motion tokens matching the following human motion description given the initial token." 
+--input "a person walks forward.<Motion Token>315</Motion Token>" 
+--lora_path ./checkpoints/pretrained_lora/pretrained.pth 
+--out_dir {output_dir} 
+--render
 
 # (text, last pose)-to-motion
-python
-generate_motion.py - -prompt
-"Generate a sequence of motion tokens matching the following human motion description given the last token." - -input
-"a person walks forward.<Motion Token>406</Motion Token>" - -lora_path. / checkpoints / pretrained_lora / pretrained.pth - -out_dir
-{output_dir} - -render
+python generate_motion.py 
+--prompt "Generate a sequence of motion tokens matching the following human motion description given the last token." 
+--input "a person walks forward.<Motion Token>406</Motion Token>" 
+--lora_path ./checkpoints/pretrained_lora/pretrained.pth 
+--out_dir {output_dir} 
+--render
 
 # (text, key poses)-to-motion
-python
-generate_motion.py - -prompt
-"Generate a sequence of motion tokens matching the following human motion description given several key tokens." - -input
-"a person walks forward.<Motion Token>315,91,406</Motion Token>" - -lora_path. / checkpoints / pretrained_lora / pretrained.pth - -out_dir
+python generate_motion.py 
+--prompt "Generate a sequence of motion tokens matching the following human motion description given several key tokens." 
+--input "a person walks forward.<Motion Token>315,91,406</Motion Token>" 
+--lora_path ./checkpoints/pretrained_lora / pretrained.pth - -out_dir
 {output_dir} - -render
 ```
 
@@ -223,7 +227,7 @@ The output results are saved under the same directory with the corresponding fil
 
 For visualization in skeleton format
 
-```python
+```
 # To visualize all the poses saved in {saved_pose_dir}
 python
 visualization / plot_3d_global.py - -dir
@@ -239,7 +243,7 @@ visualization / plot_3d_global.py - -dir
 
 For SMPL mesh rendering
 
-```python
+```
 # To visualize all the poses saved in {saved_pose_dir}
 python
 visualization / render.py - -dir
